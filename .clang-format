@@ -1,8 +1,8 @@
 ---
-BasedOnStyle: Google
+BasedOnStyle: LLVM
 AlignAfterOpenBracket: Align
-AlignConsecutiveAssignments: 'true'
-AlignConsecutiveDeclarations: 'true'
+AlignConsecutiveAssignments: 'false'
+AlignConsecutiveDeclarations: 'false'
 AlignOperands: 'true'
 AllowAllParametersOfDeclarationOnNextLine: 'false'
 AllowShortCaseLabelsOnASingleLine: 'false'
