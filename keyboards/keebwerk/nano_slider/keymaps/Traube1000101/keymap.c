@@ -91,14 +91,33 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
-uint8_t divisor = 0;
-
 void slider(void) {
-    if (divisor++) { // only run the slider function 1/256 times it's called
+    static uint8_t last_midi_value = 0xFF;
+    static uint8_t candidate_value = 0xFF;
+    static uint8_t stable_count = 0;
+    const uint8_t MIDI_MAX = 0x7F;
+    const uint8_t REQUIRED_STABLE = 8;
+
+    uint8_t current_value = MIDI_MAX - (analogReadPin(SLIDER_PIN) >> 3);
+
+    if (current_value == last_midi_value) {
+        candidate_value = current_value;
+        stable_count = 0;
         return;
     }
 
-    midi_send_cc(&midi_device, 2, midi2vol, 0x7F - (analogReadPin(SLIDER_PIN) >> 3));
+    if (current_value != candidate_value) {
+        candidate_value = current_value;
+        stable_count = 1;
+        return;
+    }
+
+    stable_count++;
+    if (stable_count >= REQUIRED_STABLE) {
+        midi_send_cc(&midi_device, 2, midi2vol, current_value);
+        last_midi_value = current_value;
+        stable_count = 0;
+    }
 }
 
 void matrix_scan_user(void) {
